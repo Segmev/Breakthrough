@@ -9,6 +9,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import kotlin.math.roundToInt
 
 class GameView : View {
 
@@ -19,11 +20,16 @@ class GameView : View {
         private var casePaint2: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
         private var piecePaint1: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
         private var piecePaint2: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        private var circlePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
         private var boardSize : Int = 0
         private var squareSize : Int = 0
 
         private var board = Array(8, { IntArray(8) })
+
+        private var touchedCellI: Int = 0
+        private var touchedCellJ: Int = 0
+        private var moveAttempted = false
     }
 
     constructor(context: Context) : super(context) {
@@ -54,6 +60,7 @@ class GameView : View {
         casePaint2.color = Color.rgb(230, 172, 0)
         piecePaint1.color = Color.WHITE
         piecePaint2.color = Color.BLACK
+        circlePaint.color = Color.argb( 55,255, 0, 0)
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -70,6 +77,8 @@ class GameView : View {
                 } else if (board[j][i] == 2) {
                     canvas.drawRect(piece, piecePaint2)
                 }
+                if (moveAttempted && i == touchedCellI && j == touchedCellJ)
+                    canvas.drawCircle(squareSize.toFloat() / 2, squareSize.toFloat() / 2, squareSize.toFloat() / 2.2f, circlePaint)
                 canvas.restore()
             }
         }
@@ -95,11 +104,18 @@ class GameView : View {
     override fun onTouchEvent(event: MotionEvent): Boolean {
 
         if (event.actionMasked == MotionEvent.ACTION_DOWN) {
-            Log.d("DOWN", "" + event.x + " - " + event.y)
+            touchedCellI = (event.x.roundToInt() / squareSize)
+            touchedCellJ = (event.y.roundToInt() / squareSize)
+            Log.d("DOWN", "$touchedCellI $touchedCellJ")
             return true
         }
         if (event.actionMasked == MotionEvent.ACTION_UP) {
-            Log.d("UP", "" + event.x + " - " + event.y)
+            moveAttempted =
+                    (touchedCellI == (event.x.roundToInt() / squareSize)
+                            && touchedCellJ == (event.y.roundToInt() / squareSize)
+                            && board[touchedCellJ][touchedCellI] > 0)
+            Log.d("UP", "$moveAttempted")
+            invalidate()
             return true
         }
 
