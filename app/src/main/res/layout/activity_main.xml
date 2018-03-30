@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#C09900"
     tools:context=".MainActivity">
 
     <com.et.segmev.breakthrough.GameView
@@ -21,5 +22,57 @@
         android:text="@string/reset_game"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/playerTurn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:text="Playing: Player 2"
+        android:textSize="18sp"
+        app:fontFamily="@font/anton"
+        app:layout_constraintBottom_toBottomOf="@+id/gameView"
+        app:layout_constraintEnd_toStartOf="@+id/resetGame" />
+
+    <TextView
+        android:id="@+id/playerOnePieces"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:text="TextView"
+        android:textSize="18sp"
+        app:fontFamily="@font/anton"
+        app:layout_constraintBottom_toTopOf="@+id/playerTwoPieces"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/playerTwoPieces"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:text="TextView"
+        android:textSize="18sp"
+        app:fontFamily="@font/anton"
+        app:layout_constraintBottom_toTopOf="@+id/resetGame"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/leftPawns"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:text="@string/left_pawns"
+        android:textSize="18sp"
+        app:fontFamily="@font/anton"
+        app:layout_constraintBottom_toTopOf="@+id/resetGame"
+        app:layout_constraintEnd_toStartOf="@+id/playerTwoPieces" />
 
 </android.support.constraint.ConstraintLayout>

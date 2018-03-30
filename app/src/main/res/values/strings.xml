@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Breakthrough</string>
+    <string name="playerOne">Whites</string>
+    <string name="playerTwo">Blacks</string>
     <string name="reset_game">Reset game</string>
+    <string name="left_pawns">Left pawns</string>
 </resources>

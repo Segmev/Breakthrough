@@ -44,6 +44,7 @@ class GameView : View {
 
     class GameLogic {
         private var currentPlayer = Players.ONE
+        private var winner = Players.NONE
 
         enum class Players {
             NONE, ONE, TWO
@@ -64,7 +65,7 @@ class GameView : View {
                 for (a in i-1..i+1) {
                     if (a in 0..7 && j+direction in 0..7
                             && (board[j+direction][a] == 0
-                                    || (board[j+direction][a] != getPlayingPlayer() && a == i))) {
+                                    || (board[j + direction][a] != getPlayingPlayer() && a != i))) {
                         availableMoves[j+direction][a] = 1
                     }
                 }
@@ -99,6 +100,7 @@ class GameView : View {
         fun resetGame() {
             moveAttempted = false
             currentPlayer = Players.ONE
+            winner = Players.NONE
         }
 
         fun play(upI : Int, upJ : Int) : Boolean {
@@ -112,6 +114,7 @@ class GameView : View {
                     Log.d("PLAY", "possible move selected !")
                     movePiece()
                     switchPlayers()
+
                 }
                 resetMovesArray()
             }
@@ -177,11 +180,13 @@ class GameView : View {
             previousTouchedCellJ = touchedCellJ
             touchedCellI = (event.x.roundToInt() / squareSize)
             touchedCellJ = (event.y.roundToInt() / squareSize)
+            performClick()
             return true
         }
         if (event.actionMasked == MotionEvent.ACTION_UP) {
             gameLogic.play(event.x.roundToInt() / squareSize, event.y.roundToInt() / squareSize)
             invalidate()
+            performClick()
             return true
         }
 
