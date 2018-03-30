@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Breakthrough</string>
+    <string name="reset_game">Reset game</string>
 </resources>

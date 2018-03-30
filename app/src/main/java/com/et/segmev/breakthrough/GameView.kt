@@ -39,7 +39,7 @@ class GameView : View {
 
         private var moveAttempted = false
 
-        private var gameLogic = GameLogic()
+        var gameLogic = GameLogic()
     }
 
     class GameLogic {
@@ -49,7 +49,7 @@ class GameView : View {
             NONE, ONE, TWO
         }
 
-        private fun getPlayer() : Int {
+        fun getPlayingPlayer() : Int {
             return currentPlayer.ordinal
         }
 
@@ -59,12 +59,12 @@ class GameView : View {
 
         private fun discoverAvailableMoves(i: Int, j: Int) {
             resetMovesArray()
-            if (moveAttempted && board[j][i] == getPlayer()) {
-                val direction = if (getPlayer() % 2 == 1) 1 else -1
+            if (moveAttempted && board[j][i] == getPlayingPlayer()) {
+                val direction = if (getPlayingPlayer() % 2 == 1) 1 else -1
                 for (a in i-1..i+1) {
                     if (a in 0..7 && j+direction in 0..7
                             && (board[j+direction][a] == 0
-                                    || (board[j+direction][a] != getPlayer() && a == i))) {
+                                    || (board[j+direction][a] != getPlayingPlayer() && a == i))) {
                         availableMoves[j+direction][a] = 1
                     }
                 }
@@ -81,13 +81,30 @@ class GameView : View {
 
         private fun movePiece() {
             board[previousTouchedCellJ][previousTouchedCellI] = 0
-            board[touchedCellJ][touchedCellI] = getPlayer()
+            board[touchedCellJ][touchedCellI] = getPlayingPlayer()
+        }
+
+        fun getPiecesNumber(player: Players) : Int {
+            var count = 0
+            for (i in 0..7) {
+                for (j in 0..7) {
+                    if (board[j][i] == player.ordinal) {
+                        count++
+                    }
+                }
+            }
+            return count
+        }
+
+        fun resetGame() {
+            moveAttempted = false
+            currentPlayer = Players.ONE
         }
 
         fun play(upI : Int, upJ : Int) : Boolean {
             moveAttempted =
                     (touchedCellI == upI && touchedCellJ == upJ
-                            && (gameLogic.getPlayer() == board[touchedCellJ][touchedCellI]))
+                            && (gameLogic.getPlayingPlayer() == board[touchedCellJ][touchedCellI]))
             if (moveAttempted)
                 discoverAvailableMoves(touchedCellI, touchedCellJ)
             else {
@@ -103,7 +120,7 @@ class GameView : View {
         }
     }
 
-    private fun init(attrs: AttributeSet?, defStyle: Int) {
+    fun resetGame() {
         for (i in 0..7) {
             board[i] = IntArray(8)
             availableMoves[i] = IntArray(8)
@@ -116,12 +133,22 @@ class GameView : View {
                     board[i][j] = 2
                 }
         }
+        gameLogic.resetGame()
+        invalidate()
+    }
+
+    fun getGameLogic() : GameLogic {
+        return gameLogic
+    }
+
+    private fun init(attrs: AttributeSet?, defStyle: Int) {
         casePaint1.color = Color.rgb(128, 96, 0)
         casePaint2.color = Color.rgb(230, 172, 0)
         piecePaint1.color = Color.WHITE
         piecePaint2.color = Color.BLACK
         circlePaintRed.color = Color.argb( 55,255, 0, 0)
         circlePaintGreen.color = Color.argb( 55,0, 255, 0)
+        resetGame()
     }
 
 
