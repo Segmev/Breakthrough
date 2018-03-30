@@ -29,7 +29,12 @@ class MainActivity : AppCompatActivity() {
                 gameView.getGameLogic().getPiecesNumber(GameView.GameLogic.Players.ONE))
         playerTwoPieces.text = String.format("${getString(R.string.playerTwo)}: %02d",
                 gameView.getGameLogic().getPiecesNumber(GameView.GameLogic.Players.TWO))
-        playerTurn.text =
-                String.format("Turn: " + if (gameView.getGameLogic().getPlayingPlayer() == 1) getString(R.string.playerOne) else getString(R.string.playerTwo))
+        if (gameView.getGameLogic().getWinner() == 0) {
+            playerTurn.text =
+                    String.format("Turn: " + if (gameView.getGameLogic().getPlayingPlayer() == 1) getString(R.string.playerOne) else getString(R.string.playerTwo))
+        } else {
+            playerTurn.text =
+                    String.format("Winners: " + if (gameView.getGameLogic().getWinner() == 1) getString(R.string.playerOne) else getString(R.string.playerTwo))
+        }
     }
 }

@@ -54,6 +54,10 @@ class GameView : View {
             return currentPlayer.ordinal
         }
 
+        fun getWinner() : Int {
+            return winner.ordinal
+        }
+
         private fun switchPlayers() {
             currentPlayer = if (currentPlayer == Players.ONE) Players.TWO else Players.ONE
         }
@@ -103,7 +107,27 @@ class GameView : View {
             winner = Players.NONE
         }
 
+        private fun checkWinningCondition() {
+            if (getPlayingPlayer() == 1) {
+                for (i in 0..7) {
+                    if (board[7][i] == 1) {
+                        winner = Players.ONE
+                        break
+                    }
+                }
+            } else if (getPlayingPlayer() == 2) {
+                for (i in 0..7) {
+                    if (board[0][i] == 2) {
+                        winner = Players.TWO
+                        break
+                    }
+                }
+            }
+        }
+
         fun play(upI : Int, upJ : Int) : Boolean {
+            if (winner != Players.NONE)
+                return false
             moveAttempted =
                     (touchedCellI == upI && touchedCellJ == upJ
                             && (gameLogic.getPlayingPlayer() == board[touchedCellJ][touchedCellI]))
@@ -111,8 +135,8 @@ class GameView : View {
                 discoverAvailableMoves(touchedCellI, touchedCellJ)
             else {
                 if (availableMoves[touchedCellJ][touchedCellI] > 0) {
-                    Log.d("PLAY", "possible move selected !")
                     movePiece()
+                    checkWinningCondition()
                     switchPlayers()
 
                 }
@@ -167,7 +191,6 @@ class GameView : View {
                 (squareSize * 25 / 100),
                 squareSize - (squareSize * 25 / 100),
                 squareSize - (squareSize * 25 / 100))
-        Log.d("Measure", "$boardSize - $squareSize")
         super.onMeasure(boardSize, boardSize)
     }
 
