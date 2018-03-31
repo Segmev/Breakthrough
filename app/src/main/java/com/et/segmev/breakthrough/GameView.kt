@@ -14,6 +14,7 @@ import kotlin.math.roundToInt
 class GameView : View {
 
     companion object {
+        private var boardRect : Rect = Rect()
         private var case : Rect = Rect()
         private var piece : Rect = Rect()
         private var casePaint1: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -191,6 +192,7 @@ class GameView : View {
                 (squareSize * 25 / 100),
                 squareSize - (squareSize * 25 / 100),
                 squareSize - (squareSize * 25 / 100))
+        boardRect.set(0, 0, boardSize, boardSize)
         super.onMeasure(boardSize, boardSize)
     }
 
@@ -217,14 +219,13 @@ class GameView : View {
     }
 
     override fun onDraw(canvas: Canvas) {
+        canvas.drawRect(boardRect, casePaint2)
         for (i in 0..7) {
             for (j in 0..7) {
                 canvas.save()
                 canvas.translate(i * (squareSize)  * 1f, j * (squareSize) * 1f)
                 if (i % 2 + j % 2 == 1)
                     canvas.drawRect(case, casePaint1)
-                else
-                    canvas.drawRect(case, casePaint2)
                 if (board[j][i] == 1) {
                     canvas.drawRect(piece, piecePaint1)
                 } else if (board[j][i] == 2) {
