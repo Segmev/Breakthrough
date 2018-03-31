@@ -21,6 +21,7 @@ class GameView : View {
         private var casePaint2: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
         private var piecePaint1: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
         private var piecePaint2: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        private var borderPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
         private var circlePaintRed: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
         private var circlePaintGreen: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -41,6 +42,19 @@ class GameView : View {
         private var moveAttempted = false
 
         var gameLogic = GameLogic()
+    }
+
+    private fun init(attrs: AttributeSet?, defStyle: Int) {
+        casePaint1.color = Color.rgb(128, 96, 0)
+        casePaint2.color = Color.rgb(230, 172, 0)
+        piecePaint1.color = Color.WHITE
+        piecePaint2.color = Color.BLACK
+        circlePaintRed.color = Color.argb( 55,255, 0, 0)
+        circlePaintGreen.color = Color.argb( 55,0, 255, 0)
+        borderPaint.color = Color.BLACK
+        borderPaint.style = Paint.Style.STROKE
+        borderPaint.strokeWidth = 5f
+        resetGame()
     }
 
     class GameLogic {
@@ -169,17 +183,6 @@ class GameView : View {
         return gameLogic
     }
 
-    private fun init(attrs: AttributeSet?, defStyle: Int) {
-        casePaint1.color = Color.rgb(128, 96, 0)
-        casePaint2.color = Color.rgb(230, 172, 0)
-        piecePaint1.color = Color.WHITE
-        piecePaint2.color = Color.BLACK
-        circlePaintRed.color = Color.argb( 55,255, 0, 0)
-        circlePaintGreen.color = Color.argb( 55,0, 255, 0)
-        resetGame()
-    }
-
-
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         boardSize =
                 if (MeasureSpec.getSize(widthMeasureSpec) < MeasureSpec.getSize(heightMeasureSpec))
@@ -235,6 +238,7 @@ class GameView : View {
                     canvas.drawCircle(squareSize.toFloat() / 2, squareSize.toFloat() / 2, squareSize.toFloat() / 2.2f, circlePaintRed)
                 if (availableMoves[j][i] > 0)
                     canvas.drawCircle(squareSize.toFloat() / 2, squareSize.toFloat() / 2, squareSize.toFloat() / 2.2f, circlePaintGreen)
+                canvas.drawRect(case, borderPaint)
                 canvas.restore()
             }
         }
