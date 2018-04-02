@@ -5,6 +5,8 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
+import android.os.Parcel
+import android.os.Parcelable
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
@@ -29,19 +31,18 @@ class GameView : View {
         private var boardSize : Int = 0
         private var squareSize : Int = 0
 
-        private var board = Array(8, { IntArray(8) })
-
-        private var availableMoves = Array(8, { IntArray(8) })
-
         private var touchedCellI: Int = 0
         private var touchedCellJ: Int = 0
 
         private var previousTouchedCellI : Int = 0
         private var previousTouchedCellJ : Int = 0
 
-        private var moveAttempted = false
 
         var gameLogic = GameLogic()
+
+        val GD = GameData(GameLogic.Players.ONE, GameLogic.Players.NONE,
+                Array(8, { IntArray(8) }),
+                Array(8, { IntArray(8)}), false)
     }
 
     private fun init(attrs: AttributeSet?, defStyle: Int) {
@@ -57,35 +58,40 @@ class GameView : View {
         resetGame()
     }
 
+    data class GameData(var currentPlayer: GameLogic.Players,
+                        var winner: GameLogic.Players,
+                        var board: Array<IntArray>,
+                        var availableMoves: Array<IntArray>,
+                        var moveAttempted: Boolean
+    )
+
     class GameLogic {
-        private var currentPlayer = Players.ONE
-        private var winner = Players.NONE
 
         enum class Players {
             NONE, ONE, TWO
         }
 
         fun getPlayingPlayer() : Int {
-            return currentPlayer.ordinal
+            return GD.currentPlayer.ordinal
         }
 
         fun getWinner() : Int {
-            return winner.ordinal
+            return GD.winner.ordinal
         }
 
         private fun switchPlayers() {
-            currentPlayer = if (currentPlayer == Players.ONE) Players.TWO else Players.ONE
+            GD.currentPlayer = if (GD.currentPlayer == Players.ONE) Players.TWO else Players.ONE
         }
 
         private fun discoverAvailableMoves(i: Int, j: Int) {
             resetMovesArray()
-            if (moveAttempted && board[j][i] == getPlayingPlayer()) {
+            if (GD.moveAttempted && GD.board[j][i] == getPlayingPlayer()) {
                 val direction = if (getPlayingPlayer() % 2 == 1) 1 else -1
                 for (a in i-1..i+1) {
                     if (a in 0..7 && j+direction in 0..7
-                            && (board[j+direction][a] == 0
-                                    || (board[j + direction][a] != getPlayingPlayer() && a != i))) {
-                        availableMoves[j+direction][a] = 1
+                            && (GD.board[j+direction][a] == 0
+                                    || (GD.board[j + direction][a] != getPlayingPlayer() && a != i))) {
+                        GD.availableMoves[j+direction][a] = 1
                     }
                 }
             }
@@ -94,21 +100,21 @@ class GameView : View {
         private fun resetMovesArray() {
             for (i in 0..7) {
                 for (j in 0..7) {
-                    availableMoves[i][j] = 0
+                    GD.availableMoves[i][j] = 0
                 }
             }
         }
 
         private fun movePiece() {
-            board[previousTouchedCellJ][previousTouchedCellI] = 0
-            board[touchedCellJ][touchedCellI] = getPlayingPlayer()
+            GD.board[previousTouchedCellJ][previousTouchedCellI] = 0
+            GD.board[touchedCellJ][touchedCellI] = getPlayingPlayer()
         }
 
         fun getPiecesNumber(player: Players) : Int {
             var count = 0
             for (i in 0..7) {
                 for (j in 0..7) {
-                    if (board[j][i] == player.ordinal) {
+                    if (GD.board[j][i] == player.ordinal) {
                         count++
                     }
                 }
@@ -117,23 +123,23 @@ class GameView : View {
         }
 
         fun resetGame() {
-            moveAttempted = false
-            currentPlayer = Players.ONE
-            winner = Players.NONE
+            GD.moveAttempted = false
+            GD.currentPlayer = Players.ONE
+            GD.winner = Players.NONE
         }
 
         private fun checkWinningCondition() {
             if (getPlayingPlayer() == 1) {
                 for (i in 0..7) {
-                    if (board[7][i] == 1) {
-                        winner = Players.ONE
+                    if (GD.board[7][i] == 1) {
+                        GD.winner = Players.ONE
                         break
                     }
                 }
             } else if (getPlayingPlayer() == 2) {
                 for (i in 0..7) {
-                    if (board[0][i] == 2) {
-                        winner = Players.TWO
+                    if (GD.board[0][i] == 2) {
+                        GD.winner = Players.TWO
                         break
                     }
                 }
@@ -141,15 +147,15 @@ class GameView : View {
         }
 
         fun play(upI : Int, upJ : Int) : Boolean {
-            if (winner != Players.NONE)
+            if (GD.winner != Players.NONE)
                 return false
-            moveAttempted =
+            GD.moveAttempted =
                     (touchedCellI == upI && touchedCellJ == upJ
-                            && (gameLogic.getPlayingPlayer() == board[touchedCellJ][touchedCellI]))
-            if (moveAttempted)
+                            && (gameLogic.getPlayingPlayer() == GD.board[touchedCellJ][touchedCellI]))
+            if (GD.moveAttempted)
                 discoverAvailableMoves(touchedCellI, touchedCellJ)
             else {
-                if (availableMoves[touchedCellJ][touchedCellI] > 0) {
+                if (GD.availableMoves[touchedCellJ][touchedCellI] > 0) {
                     movePiece()
                     checkWinningCondition()
                     switchPlayers()
@@ -164,15 +170,15 @@ class GameView : View {
 
     fun resetGame() {
         for (i in 0..7) {
-            board[i] = IntArray(8)
-            availableMoves[i] = IntArray(8)
+            GD.board[i] = IntArray(8)
+            GD.availableMoves[i] = IntArray(8)
             if (i <= 1)
                 for (j in 0..7) {
-                    board[i][j] = 1
+                    GD.board[i][j] = 1
                 }
             else if (i >= 6)
                 for (j in 0..7) {
-                    board[i][j] = 2
+                    GD.board[i][j] = 2
                 }
         }
         gameLogic.resetGame()
@@ -229,14 +235,14 @@ class GameView : View {
                 canvas.translate(i * (squareSize)  * 1f, j * (squareSize) * 1f)
                 if (i % 2 + j % 2 == 1)
                     canvas.drawRect(case, casePaint1)
-                if (board[j][i] == 1) {
+                if (GD.board[j][i] == 1) {
                     canvas.drawRect(piece, piecePaint1)
-                } else if (board[j][i] == 2) {
+                } else if (GD.board[j][i] == 2) {
                     canvas.drawRect(piece, piecePaint2)
                 }
-                if (moveAttempted && i == touchedCellI && j == touchedCellJ)
+                if (GD.moveAttempted && i == touchedCellI && j == touchedCellJ)
                     canvas.drawCircle(squareSize.toFloat() / 2, squareSize.toFloat() / 2, squareSize.toFloat() / 2.2f, circlePaintRed)
-                if (availableMoves[j][i] > 0)
+                if (GD.availableMoves[j][i] > 0)
                     canvas.drawCircle(squareSize.toFloat() / 2, squareSize.toFloat() / 2, squareSize.toFloat() / 2.2f, circlePaintGreen)
                 canvas.drawRect(case, borderPaint)
                 canvas.restore()
