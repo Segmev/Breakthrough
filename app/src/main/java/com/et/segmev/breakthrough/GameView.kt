@@ -63,7 +63,57 @@ class GameView : View {
                         var board: Array<IntArray>,
                         var availableMoves: Array<IntArray>,
                         var moveAttempted: Boolean
-    )
+    ) : Parcelable {
+        constructor(parcel: Parcel) : this(
+                GameLogic.Players.values()[parcel.readByte().toInt()],
+                GameLogic.Players.values()[parcel.readByte().toInt()],
+                Array(8, { IntArray(8) }),
+                Array(8, { IntArray(8) }),
+                parcel.readByte() != 0.toByte()) {
+            board = parcel.readBoardArray()
+            availableMoves = parcel.readAvailableMovesArray()
+        }
+
+        private fun Parcel.readBoardArray() : Array<IntArray> {
+            val boardArray = Array(8, {IntArray(8)})
+            for (i in 0..7)
+                readIntArray(boardArray[i])
+            return boardArray
+        }
+
+        private fun Parcel.readAvailableMovesArray() : Array<IntArray> {
+            val availableMovesArray = Array(8, {IntArray(8)})
+            for (i in 0..7)
+                readIntArray(availableMovesArray[i])
+            return availableMovesArray
+        }
+
+        override fun writeToParcel(parcel: Parcel, flags: Int) {
+            parcel.writeByte(currentPlayer.ordinal.toByte())
+            parcel.writeByte(winner.ordinal.toByte())
+
+            for (i in 0..7)
+                parcel.writeIntArray(board[i])
+            for (i in 0..7)
+                parcel.writeIntArray(availableMoves[i])
+
+            parcel.writeByte(if (moveAttempted) 1 else 0)
+        }
+
+        override fun describeContents(): Int {
+            return 0
+        }
+
+        companion object CREATOR : Parcelable.Creator<GameData> {
+            override fun createFromParcel(parcel: Parcel): GameData {
+                return GameData(parcel)
+            }
+
+            override fun newArray(size: Int): Array<GameData?> {
+                return arrayOfNulls(size)
+            }
+        }
+    }
 
     class GameLogic {
 
